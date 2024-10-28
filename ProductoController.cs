@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using CrudProductos;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CrudProductos
@@ -36,6 +34,48 @@ namespace CrudProductos
         {
             var productos = await _context.Productos.ToListAsync();
             return Ok(productos);
+        }
+
+        [HttpGet("{id}")]
+
+        public async Task<IActionResult> GetById(int id)
+        {
+            var producto = await _context.Productos.FindAsync(id);
+            if (producto == null)
+            {
+                throw new Exception("No existe el producto");
+            }
+            return Ok(producto);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var producto = await _context.Productos.FindAsync(id);
+            if (producto == null)
+            {
+                throw new Exception("No existe el producto");
+            }
+            _context.Remove(producto);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromBody] Productos modelo, int id)
+        {
+            var producto = await _context.Productos.FindAsync(id);
+            if (producto == null)
+            {
+                throw new Exception("No existe el producto");
+            }
+            producto.Nombre = modelo.Nombre;
+            producto.Precio = modelo.Precio;
+
+            _context.Update(producto);
+            await _context.SaveChangesAsync();
+            return Ok();
+
         }
     }
 }
